@@ -1,0 +1,68 @@
+/* CSS Properties */
+
+:root {
+--cells-per-rows: 10;
+}
+
+/* Reset */
+
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+
+/* Generics */
+
+body{
+font-family: sans-serif;
+background-color: darkblue;
+}
+
+.container{
+width: 100%;
+max-width: 1080px;
+margin: 0 auto;
+}
+
+/* Header */
+header{
+height: 10vh;
+background-color: white;
+}
+
+main{
+height: 80vh;
+}
+
+/* Grid */
+#grid{
+width: 70vh;
+height: 70vh;
+margin: 50px auto;
+display: flex;
+align-items: center;
+justify-content: center;
+flex-wrap: wrap;
+}
+
+#grid .cell{
+width: calc(100% / var(--cells-per-rows));
+height: calc(100% / var(--cells-per-rows));
+border: 2px solid white;
+cursor: pointer;
+color: white;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+#grid .cell.clicked{
+background-color: dodgerblue;
+}
+
+/* Footer */
+footer{
+height: 10vh;
+background-color: white;
+}
