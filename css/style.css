@@ -59,6 +59,11 @@ justify-content: center;
 
 #grid .cell.clicked{
 background-color: dodgerblue;
+cursor: not-allowed;
+}
+
+#grid .cell.clicked.bomb{
+background-color: red;
 }
 
 /* Footer */

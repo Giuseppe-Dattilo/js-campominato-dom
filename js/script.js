@@ -30,6 +30,15 @@ Aggiungere una select accanto al bottone di generazione, che fornisca una scelta
 */
 
 
+// Prendo gli elementi dal DOM
+const grid = document.getElementById('grid');
+const levelElement = document.getElementById('level');
+const buttonElement = document.getElementById('play');
+const beginElement = document.getElementById('begin');
+const scoreDisplay = document.getElementById('display-score');
+
+let isGameOver = false;
+
 // Funzione per creare una cella 
 const createCell = (number) => {
     const cell = document.createElement('div');
@@ -38,14 +47,13 @@ const createCell = (number) => {
     return cell; 
 }
 
-
 // Funzione per creare un numero random
 const getRandomNumber = (min, max, numbers) => {
     let bombCluster = [];
 
     while (bombCluster.length < numbers){
         let randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
-        if(!bombCluster.includes(randomNumber)) {
+        if(!bombCluster.includes(randomNumber)) { //Continuo finchè il numero è presente nell'array
             bombCluster.push(randomNumber);
         }
     }
@@ -53,11 +61,30 @@ const getRandomNumber = (min, max, numbers) => {
     return bombCluster;
 }
 
-// Prendo gli elementi dal DOM
-const grid = document.getElementById('grid');
-const levelElement = document.getElementById('level');
-const buttonElement = document.getElementById('play');
-const beginElement = document.getElementById('begin');
+const gameOver = (score, bombs, hasHitBomb ) => {
+    const message = hasHitBomb ? 'Hai perso!' : 'Hai vinto!';
+    alert(message);
+
+    revealCells(bombs);
+}
+
+const revealCells = bombs => {
+    // Recupero le celle
+    const cells = document.querySelectorAll('.cell');
+    
+    for (let i = 0; i < cells.length; i++) {
+        const cell = cells[i];
+
+        // Aggiungo classe clicked
+        cell.classList.add('clicked');
+
+        // Se è una bomba, aggiungo classe bomb
+        const cellNumber = parseInt(cell.innerText);
+        if(bombs.includes(cellNumber)){
+            cell.classList.add('bomb');
+        }
+    } 
+}
 
 // Aggancio l'evento al click del bottone
 buttonElement.addEventListener('click', () => {
@@ -65,13 +92,14 @@ buttonElement.addEventListener('click', () => {
     // Svuoto la griglia e cambio l'innerText del bottone
     grid.innerHTML = "";
     buttonElement.innerText = 'Nuova partita'
+    scoreDisplay.innerText = "0";
         
     beginElement.classList.add('d-none');
 
     // Calcolo righe e colonne
     let rows = levelElement.value;
     let cols = levelElement.value;
-    console.log(rows, cols);
+    // console.log(rows, cols);
 
     // Setto il valore della custom property
     const root = document.querySelector (':root');
@@ -79,22 +107,56 @@ buttonElement.addEventListener('click', () => {
 
     // Calcolo il numero di celle totali 
     const totalCells = rows * cols;
-    console.log(totalCells);
+    // console.log(totalCells);
+
+    // Preparo la variabile per il punteggio
+    let score = 1;
+
+    // numero di  bombe
+    const totalBombs = 16;
+
+    // Punteggio massimo
+    const maxPoints = totalCells -totalBombs;
 
     // Genero i numeri random delle bombe
     const bombs = getRandomNumber (1, totalCells, 16);
-    console.log(bombs);
+    // console.log(bombs);
 
     for(let i = 1; i <= totalCells; i++){
     
         // Creo una cella
         const cell = createCell(i);
-        console.log(i);
+        // console.log(i);
     
         // aggiungo l'event listener alla cella
         cell.addEventListener('click', () => {
-            cell.classList.toggle('clicked');
-            });
+
+            //Controllo, se la cella è stata cliccata esco dalla funzione
+            if(cell.classList.contains('clicked')) {
+                return;
+            } 
+
+            cell.classList.add('clicked');
+
+            // Controllo se ho preso una bomba
+            const hasHitBomb = bombs.includes(parseInt(cell.innerText));
+            if(hasHitBomb) {
+                cell.classList.add('bomb');
+                gameOver (score, bombs, hasHitBomb);
+                
+            } else{
+
+            // Incremento il punteggio
+            scoreDisplay.innerText = score++;
+            // console.log(score);
+
+              if(score === maxPoints){
+                gameOver (score, bombs, hasHitBomb);
+              }
+                
+            }
+
+        });
         
         // appendo in pagina
         grid.appendChild(cell);
